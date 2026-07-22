@@ -24,28 +24,7 @@
             --link-color: #5a6a7a;
         }
 
-        /* ===== 暗色主题 – 跟随系统 ===== */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #1a1e26;
-                --card-bg: #242a34;
-                --card-border: #313842;
-                --text-primary: #e6edf5;
-                --text-secondary: #b0c0d0;
-                --text-muted: #7a8a9a;
-                --badge-bg: #2d3540;
-                --badge-color: #b0c0d0;
-                --divider-bg: #3a434f;
-                --meta-border: #2d3540;
-                --footer-border: #2d3540;
-                --btn-border: #4a5a6a;
-                --btn-color: #b0c0d0;
-                --btn-hover-bg: #2d3540;
-                --link-color: #8a9aaa;
-            }
-        }
-
-        /* ===== 用户手动覆盖 – 强制暗色 ===== */
+        /* ===== 暗色主题 (通过 data-theme="dark" 触发) ===== */
         [data-theme="dark"] {
             --bg: #1a1e26;
             --card-bg: #242a34;
@@ -62,25 +41,6 @@
             --btn-color: #b0c0d0;
             --btn-hover-bg: #2d3540;
             --link-color: #8a9aaa;
-        }
-
-        /* ===== 用户手动覆盖 – 强制亮色 ===== */
-        [data-theme="light"] {
-            --bg: #f7f8fa;
-            --card-bg: #ffffff;
-            --card-border: #eaeef2;
-            --text-primary: #1d2a3a;
-            --text-secondary: #3e4e5e;
-            --text-muted: #8e9eae;
-            --badge-bg: #eef2f6;
-            --badge-color: #4a5a6a;
-            --divider-bg: #d0d8e0;
-            --meta-border: #eef2f6;
-            --footer-border: #f0f3f6;
-            --btn-border: #d0d8e0;
-            --btn-color: #3e4e5e;
-            --btn-hover-bg: #f0f3f6;
-            --link-color: #5a6a7a;
         }
 
         /* ===== 全局重置 ===== */
@@ -285,7 +245,7 @@
         <!-- 描述 -->
         <p class="description">
             网站尚未搭建完成，暂不开放。<br>
-            <span class="highlight">（这可能需要数年甚至更久）</span>
+            <span class="highlight">（这可能会持续数年甚至更久）</span>
         </p>
 
         <!-- 署名与日期 -->
@@ -301,7 +261,7 @@
 
         <!-- 主题切换按钮 -->
         <div class="theme-toggle">
-            <button id="theme-switch" aria-label="切换主题模式">自动</button>
+            <button id="theme-switch" aria-label="切换亮色/暗色模式">亮色</button>
         </div>
 
     </div>
@@ -312,60 +272,42 @@
 
             const root = document.documentElement;
             const switchBtn = document.getElementById('theme-switch');
-            let currentTheme = 'auto'; // 'auto' | 'dark' | 'light'
 
-            // 从 localStorage 读取用户偏好，若无则默认 'auto'
-            function loadTheme() {
-                const stored = localStorage.getItem('theme');
-                if (stored === 'dark' || stored === 'light' || stored === 'auto') {
-                    return stored;
-                }
-                return 'auto';
+            // 获取当前主题，默认 'light'
+            function getCurrentTheme() {
+                return root.getAttribute('data-theme') || 'light';
             }
 
-            // 应用主题到 <html> 并更新按钮文字
+            // 应用主题并更新按钮文字
             function applyTheme(theme) {
-                currentTheme = theme;
-                if (theme === 'auto') {
-                    root.removeAttribute('data-theme');
-                } else {
-                    root.setAttribute('data-theme', theme);
-                }
-                updateButtonText(theme);
-            }
-
-            function updateButtonText(theme) {
-                if (theme === 'auto') {
-                    switchBtn.textContent = '自动';
-                } else if (theme === 'dark') {
+                if (theme === 'dark') {
+                    root.setAttribute('data-theme', 'dark');
                     switchBtn.textContent = '暗色';
-                } else if (theme === 'light') {
+                } else {
+                    root.removeAttribute('data-theme');
                     switchBtn.textContent = '亮色';
                 }
+                localStorage.setItem('theme', theme);
             }
 
-            // 切换循环：auto → dark → light → auto
-            function cycleTheme() {
-                let next;
-                if (currentTheme === 'auto') {
-                    next = 'dark';
-                } else if (currentTheme === 'dark') {
-                    next = 'light';
-                } else { // 'light'
-                    next = 'auto';
-                }
+            // 切换亮/暗
+            function toggleTheme() {
+                const current = getCurrentTheme();
+                const next = (current === 'light') ? 'dark' : 'light';
                 applyTheme(next);
-                localStorage.setItem('theme', next);
             }
 
-            // 初始化
+            // 初始化：从 localStorage 读取偏好，若无则默认 'light'
             function init() {
-                const saved = loadTheme();
-                applyTheme(saved);
-                switchBtn.addEventListener('click', cycleTheme);
+                const stored = localStorage.getItem('theme');
+                let theme = 'light';
+                if (stored === 'dark' || stored === 'light') {
+                    theme = stored;
+                }
+                applyTheme(theme);
+                switchBtn.addEventListener('click', toggleTheme);
             }
 
-            // DOM 就绪后执行
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', init);
             } else {
