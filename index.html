@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>网站施工中...</title>
     <style>
-        /* ===== CSS 变量 – 亮色主题 (默认) ===== */
+        /* ===== CSS 变量 – 亮色主题 ===== */
         :root {
             --bg: #f7f8fa;
             --card-bg: #ffffff;
@@ -24,7 +24,7 @@
             --link-color: #5a6a7a;
         }
 
-        /* ===== 暗色主题 (通过 data-theme="dark" 触发) ===== */
+        /* ===== 暗色主题 ===== */
         [data-theme="dark"] {
             --bg: #1a1e26;
             --card-bg: #242a34;
@@ -149,7 +149,7 @@
             transition: color 0.25s ease;
         }
 
-        /* ===== 底部服务信息 ===== */
+        /* ===== 底部信息 ===== */
         .footer-note {
             margin-top: 32px;
             font-size: 13px;
@@ -158,6 +158,10 @@
             border-top: 1px solid var(--footer-border);
             padding-top: 24px;
             transition: color 0.25s ease, border-color 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
 
         .footer-note a {
@@ -172,7 +176,11 @@
             color: var(--text-primary);
         }
 
-        /* ===== 主题切换按钮容器 ===== */
+        .footer-note .extra-link {
+            font-size: 13px;
+        }
+
+        /* ===== 主题切换按钮 ===== */
         .theme-toggle {
             margin-top: 20px;
             display: flex;
@@ -204,7 +212,7 @@
             outline-offset: 2px;
         }
 
-        /* ===== 响应式微调 ===== */
+        /* ===== 响应式 ===== */
         @media (max-width: 480px) {
             .card {
                 padding: 32px 20px 28px;
@@ -254,9 +262,12 @@
             <span class="date">2026 年 07 月 22 日</span>
         </div>
 
-        <!-- 底部服务信息 -->
+        <!-- 底部信息：网络服务 + 额外链接 -->
         <div class="footer-note">
             <span>由 <a href="https://www.cloudflare.com">Cloudflare</a> 提供性能与安全服务</span>
+            <span class="extra-link">
+                <a href="http://3752113809.dpdns.org" target="_blank">另一个页面 →</a>
+            </span>
         </div>
 
         <!-- 主题切换按钮 -->
@@ -273,12 +284,10 @@
             const root = document.documentElement;
             const switchBtn = document.getElementById('theme-switch');
 
-            // 获取当前主题，默认 'light'
             function getCurrentTheme() {
                 return root.getAttribute('data-theme') || 'light';
             }
 
-            // 应用主题并更新按钮文字
             function applyTheme(theme) {
                 if (theme === 'dark') {
                     root.setAttribute('data-theme', 'dark');
@@ -290,14 +299,12 @@
                 localStorage.setItem('theme', theme);
             }
 
-            // 切换亮/暗
             function toggleTheme() {
                 const current = getCurrentTheme();
                 const next = (current === 'light') ? 'dark' : 'light';
                 applyTheme(next);
             }
 
-            // 初始化：从 localStorage 读取偏好，若无则默认 'light'
             function init() {
                 const stored = localStorage.getItem('theme');
                 let theme = 'light';
